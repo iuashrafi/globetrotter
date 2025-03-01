@@ -5,8 +5,15 @@ import { useGameContext } from "../context/GameContext";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import UserRegistration from "./UserRegistration";
+import ChallengeButton from "./ChallengeButton";
+import InviteBanner from "./InviteBanner";
 
-const Game: React.FC = () => {
+interface GameProps {
+  invitedBy?: string | null;
+}
+
+const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
   const {
     destination,
     loading,
@@ -14,9 +21,10 @@ const Game: React.FC = () => {
     score,
     result,
     showResult,
+    gameOver,
+    username,
     fetchNewDestination,
     handleAnswer,
-    gameOver,
   } = useGameContext();
 
   const { width, height } = useWindowSize();
@@ -26,6 +34,22 @@ const Game: React.FC = () => {
       fetchNewDestination();
     }
   }, [destination, fetchNewDestination]);
+
+  if (gameOver) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-2xl font-bold text-blue-800 mb-4">Game Over!</h2>
+        <p className="mb-4">
+          You've played through all available destinations.
+        </p>
+        <p className="text-lg">
+          Your final score: {score.correct} correct out of{" "}
+          {score.correct + score.incorrect} total answers.
+        </p>
+        <ChallengeButton />
+      </div>
+    );
+  }
 
   if (loading && !destination) {
     return (
@@ -47,17 +71,14 @@ const Game: React.FC = () => {
     );
   }
 
-  if (gameOver) {
-    return (
-      <div className="text-center p-4 text-xl font-bold text-gray-700">
-        🎉 You've completed the Globetrotter Challenge! 🎉
-        <p className="text-gray-500 mt-2">Refresh the page to restart.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="game-container max-w-3xl mx-auto p-4">
+      {/* User Registration */}
+      <UserRegistration />
+
+      {/* Show Invite Banner if user was invited */}
+      {invitedBy && <InviteBanner invitedBy={invitedBy} />}
+
       {/* Score display */}
       <div className="score-container flex justify-between mb-6">
         <div className="correct text-green-500">Correct: {score.correct}</div>
@@ -154,6 +175,9 @@ const Game: React.FC = () => {
           </motion.div>
         </div>
       )}
+
+      {/* Challenge button */}
+      {username && !showResult && <ChallengeButton />}
     </div>
   );
 };

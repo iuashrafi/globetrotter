@@ -8,6 +8,7 @@ import { useWindowSize } from "react-use";
 import UserRegistration from "./UserRegistration";
 import ChallengeButton from "./ChallengeButton";
 import InviteBanner from "./InviteBanner";
+import Image from "next/image";
 
 interface GameProps {
   invitedBy?: string | null;
@@ -29,11 +30,11 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
   const { width, height } = useWindowSize();
 
-  useEffect(() => {
-    if (!destination) {
-      fetchNewDestination();
-    }
-  }, [destination, fetchNewDestination]);
+  // useEffect(() => {
+  //   if (!destination) {
+  //     fetchNewDestination();
+  //   }
+  // }, [destination, fetchNewDestination]);
 
   if (gameOver) {
     return (
@@ -74,24 +75,22 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
   return (
     <div className="game-container max-w-3xl mx-auto p-4">
       {/* User Registration */}
-      <UserRegistration />
+      {/* <UserRegistration /> */}
 
       {/* Show Invite Banner if user was invited */}
       {invitedBy && <InviteBanner invitedBy={invitedBy} />}
 
       {/* Score display */}
-      <div className="score-container flex justify-between mb-6">
+      {/* <div className="score-container flex justify-between mb-6">
         <div className="correct text-green-500">Correct: {score.correct}</div>
         <div className="incorrect text-red-500">
           Incorrect: {score.incorrect}
         </div>
-      </div>
+      </div> */}
 
-      {/* Clues section */}
-      <div className="clues-container bg-blue-50 p-6 rounded-lg mb-8 shadow-md">
-        <h2 className="text-xl font-bold mb-4 text-blue-800">Where am I?</h2>
-        <ul className="list-disc pl-5 space-y-3">
-          {destination.clues.map((clue, index) => (
+      <div className="bg-green-00 p-8 space-y-4">
+        <ul className="text-[#061720] font-bold">
+          {destination.clues?.slice(0, 1).map((clue, index) => (
             <motion.li
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -103,12 +102,48 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
             </motion.li>
           ))}
         </ul>
+        <Image src="/man.png" alt="" width={200} height={200} />
       </div>
+      {/* new Options section */}
+      {!showResult && (
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {destination.options?.map((option, index) => (
+            <motion.button
+              key={index}
+              className="bg-white border-2 border-[#DBE2E6] text-[#7A8B94] font-bold p-4 text-lg border-b-3 rounded-xl shadow transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => handleAnswer(option)}
+            >
+              {option}
+            </motion.button>
+          ))}
+        </div>
+      )}
+      {/* result section  - pending */}
 
-      {/* Options section */}
-      {!showResult ? (
+      {/* Clues section - old version not required*/}
+      {/* <div className="clues-container bg-blue-50 p-6 rounded-lg mb-8 shadow-md">
+        <h2 className="text-xl font-bold mb-4 text-blue-800">Where am I?</h2>
+        <ul className="list-disc pl-5 space-y-3">
+          {destination.clues?.map((clue, index) => (
+            <motion.li
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.3 }}
+              className="text-gray-700"
+            >
+              {clue}
+            </motion.li>
+          ))}
+        </ul>
+      </div> */}
+
+      {/* Options section -- old version */}
+      {/* {!showResult ? (
         <div className="options-container grid grid-cols-1 md:grid-cols-2 gap-4">
-          {destination.options.map((option, index) => (
+          {destination.options?.map((option, index) => (
             <motion.button
               key={index}
               className="option-button bg-white border-2 border-blue-500 hover:bg-blue-100 text-blue-700 p-4 rounded-lg shadow transition-colors"
@@ -122,7 +157,6 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
         </div>
       ) : (
         <div className="result-container">
-          {/* Confetti for correct answer */}
           {result?.isCorrect && (
             <Confetti
               width={width}
@@ -174,7 +208,7 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
             </motion.button>
           </motion.div>
         </div>
-      )}
+      )} */}
 
       {/* Challenge button */}
       {username && !showResult && <ChallengeButton />}

@@ -1,18 +1,17 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { 
-  createUser, 
-  updateScore, 
-  getUserScore 
-} = require('../controllers/userController');
+const {
+  createUser,
+  updateScore,
+  addUsedQuestion,
+  getUserData,
+  resetProgress,
+} = require("../controllers/userController");
 
-// Create user
-router.post('/', createUser);
-
-// Update score
-router.post('/score', updateScore);
-
-// Get user score
-router.get('/:username/score', getUserScore);
+router.post("/", createUser);
+router.post("/score", updateScore);
+router.post("/used-question", addUsedQuestion);
+router.get("/:username/data", getUserData);
+router.post("/reset", resetProgress);
 
 module.exports = router;

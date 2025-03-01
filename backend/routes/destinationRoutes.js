@@ -1,11 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { 
-  getRandomDestination, 
-  checkAnswer, 
-} = require('../controllers/destinationController');
+const {
+  getRandomDestination,
+  checkAnswer,getRandomDestinationForGuests
+} = require("../controllers/destinationController");
 
-router.get('/random', getRandomDestination);
-router.post('/check-answer', checkAnswer);
+router.get("/random", getRandomDestination);
+router.post("/random",getRandomDestinationForGuests);
+router.post("/check-answer", checkAnswer);
 
 module.exports = router;

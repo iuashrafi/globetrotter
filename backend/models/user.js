@@ -15,7 +15,15 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  usedQuestions: {
+    type: [String],
+    default: []
+  },
   createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  lastLogin: {
     type: Date,
     default: Date.now
   }

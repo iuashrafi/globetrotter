@@ -18,7 +18,7 @@ export default function CustomButton({
     <motion.button
       whileTap={{ scale: 0.99, borderBottomWidth: 0 }}
       onClick={onClick}
-      className={`bg-[#EB9D2A] text-white font-bold w-[200px] py-4 px-6 border-b-6 border-[#B17716] rounded-xl flex items-center justify-center gap-2 ${className}`}
+      className={`bg-[#EB9D2A] text-white font-bold w-[250px] py-4 px-6 border-b-6 border-[#B17716] rounded-xl flex items-center justify-center gap-2 ${className}`}
     >
       {icon && <span>{icon}</span>}
       {title}

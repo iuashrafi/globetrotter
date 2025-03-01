@@ -71,3 +71,18 @@ a {
 .bounce-animation {
   animation: bounce 2s infinite ease-in-out;
 }
+
+
+/* app colors */
+
+.bg-app-primary{
+  background-color:  #EB9D2A;
+}
+
+.app-text-color{
+  color :#061720;
+}
+
+/* .app-border-color{
+  
+} */

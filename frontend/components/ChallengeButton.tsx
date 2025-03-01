@@ -4,6 +4,8 @@ import React, { useState, useRef } from "react";
 import { useGameContext } from "../context/GameContext";
 import { motion, AnimatePresence } from "framer-motion";
 import html2canvas from "html2canvas";
+import CustomButton from "./CustomButton";
+import { Copy, Users, X } from "lucide-react";
 
 const ChallengeButton: React.FC = () => {
   const { username, score } = useGameContext();
@@ -62,34 +64,19 @@ const ChallengeButton: React.FC = () => {
     <>
       {username && (
         <motion.div
-          className="text-center my-6"
+          className=""
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          <button
+          <CustomButton
+            title="Challenge a Friend"
+            icon={<Users />}
             onClick={() => {
               setShowModal(true);
               // Generate image immediately when opening modal
               setTimeout(() => generateShareImage(), 100);
             }}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-6 rounded-lg shadow inline-flex items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-            Challenge a Friend
-          </button>
+          />
         </motion.div>
       )}
 
@@ -97,55 +84,42 @@ const ChallengeButton: React.FC = () => {
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 p-4"
+            className="fixed inset-0 flex items-center justify-center z-50 bg-[#EEEFE8]/60 backdrop-blur-xl p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden"
+              className="bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl  max-w-md w-full overflow-hidden"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-blue-800">
+                  <h3 className="text-xl font-bold app-text-color">
                     Challenge a Friend
                   </h3>
                   <button
                     onClick={() => setShowModal(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <X />
                   </button>
                 </div>
 
                 {/* Share Card that will be converted to image */}
                 <div
                   ref={shareCardRef}
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg text-white mb-4"
+                  className="bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-600 py-8 px-6 rounded-lg text-white mb-4"
                 >
-                  <div className="text-center mb-2">
-                    <h4 className="text-2xl font-bold">🌎 Globetrotter</h4>
+                  <div className="text-center mb-4">
+                    <h4 className="text-2xl font-bold">Globetrotter</h4>
                     <p className="text-sm opacity-90">
                       The Ultimate Travel Guessing Game
                     </p>
                   </div>
-                  <div className="bg-white bg-opacity-20 p-4 rounded-md backdrop-blur-sm">
+                  <div className="bg-[#EEEFE8]/30 p-4 rounded-md backdrop-blur-xl">
                     <p className="font-medium">
                       I, <span className="font-bold">{username}</span>,
                       challenge you!
@@ -155,9 +129,6 @@ const ChallengeButton: React.FC = () => {
                       <span className="font-bold text-xl">{score.correct}</span>{" "}
                       correct answers?
                     </p>
-                  </div>
-                  <div className="mt-4 text-center text-sm opacity-80">
-                    Scan or click the link to play!
                   </div>
                 </div>
 
@@ -200,23 +171,10 @@ const ChallengeButton: React.FC = () => {
                   </button>
                   <button
                     onClick={handleCopyLink}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md flex items-center justify-center"
+                    className="space-x-2 w-full bg-[#EB9D2A] hover:bg-orange-400 text-white py-2 px-4 rounded-md flex items-center justify-center"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      />
-                    </svg>
-                    Copy Invite Link
+                    <Copy />
+                    <span>Copy Invite Link</span>
                   </button>
                 </div>
               </div>

@@ -72,17 +72,10 @@ const UserRegistration: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto"
         >
-          <h2 className="text-xl font-bold mb-4 text-blue-800">
-            Enter Your Username
+          <h2 className="text-xl font-bold mb-4 text-[#EB9D2A]">
+            Login or Register
           </h2>
-          {/* Show message about existing progress */}
-          {(score.correct > 0 || score.incorrect > 0) && (
-            <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md text-sm">
-              You have existing progress ({score.correct} correct,{" "}
-              {score.incorrect} incorrect). When you sign in, this progress will
-              be transferred to your account.
-            </div>
-          )}
+
           <form onSubmit={handleSubmit}>
             <input
               type="text"
@@ -96,7 +89,7 @@ const UserRegistration: React.FC = () => {
             {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
             <button
               type="submit"
-              className={`w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors ${
+              className={`w-full mt-4 bg-[#EB9D2A] hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors ${
                 isLoading || gameLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
               disabled={isLoading || gameLoading}

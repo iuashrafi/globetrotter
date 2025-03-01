@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useGameContext } from "../context/GameContext";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
@@ -9,6 +9,8 @@ import UserRegistration from "./UserRegistration";
 import ChallengeButton from "./ChallengeButton";
 import InviteBanner from "./InviteBanner";
 import Image from "next/image";
+import { AnswerResult, Destination } from "@/services/api";
+import ResultFeedback from "./ResultFeedback";
 
 interface GameProps {
   invitedBy?: string | null;
@@ -30,20 +32,22 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
   const { width, height } = useWindowSize();
 
-  // useEffect(() => {
-  //   if (!destination) {
-  //     fetchNewDestination();
-  //   }
-  // }, [destination, fetchNewDestination]);
+  useEffect(() => {
+    if (!destination) {
+      fetchNewDestination();
+    }
+  }, [destination, fetchNewDestination]);
 
   if (gameOver) {
     return (
       <div className="text-center p-8">
-        <h2 className="text-2xl font-bold text-blue-800 mb-4">Game Over!</h2>
-        <p className="mb-4">
+        <h2 className="mt-8 text-4xl font-bold text-[#EB9D2A] mb-4">
+          Game Over!
+        </h2>
+        <p className="mb-4 text-xl">
           You've played through all available destinations.
         </p>
-        <p className="text-lg">
+        <p className="text-xl font-semibold">
           Your final score: {score.correct} correct out of{" "}
           {score.correct + score.incorrect} total answers.
         </p>
@@ -80,32 +84,10 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
       {/* Show Invite Banner if user was invited */}
       {invitedBy && <InviteBanner invitedBy={invitedBy} />}
 
-      {/* Score display */}
-      {/* <div className="score-container flex justify-between mb-6">
-        <div className="correct text-green-500">Correct: {score.correct}</div>
-        <div className="incorrect text-red-500">
-          Incorrect: {score.incorrect}
-        </div>
-      </div> */}
+      <CluesComponent destination={destination} />
 
-      <div className="bg-green-00 p-8 space-y-4">
-        <ul className="text-[#061720] font-bold">
-          {destination.clues?.slice(0, 1).map((clue, index) => (
-            <motion.li
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.3 }}
-              className="text-gray-700"
-            >
-              {clue}
-            </motion.li>
-          ))}
-        </ul>
-        <Image src="/man.png" alt="" width={200} height={200} />
-      </div>
       {/* new Options section */}
-      {!showResult && (
+      {!showResult ? (
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
           {destination.options?.map((option, index) => (
             <motion.button
@@ -119,26 +101,9 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
             </motion.button>
           ))}
         </div>
+      ) : (
+        <ResultFeedback />
       )}
-      {/* result section  - pending */}
-
-      {/* Clues section - old version not required*/}
-      {/* <div className="clues-container bg-blue-50 p-6 rounded-lg mb-8 shadow-md">
-        <h2 className="text-xl font-bold mb-4 text-blue-800">Where am I?</h2>
-        <ul className="list-disc pl-5 space-y-3">
-          {destination.clues?.map((clue, index) => (
-            <motion.li
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.3 }}
-              className="text-gray-700"
-            >
-              {clue}
-            </motion.li>
-          ))}
-        </ul>
-      </div> */}
 
       {/* Options section -- old version */}
       {/* {!showResult ? (
@@ -212,6 +177,32 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
       {/* Challenge button */}
       {username && !showResult && <ChallengeButton />}
+    </div>
+  );
+};
+
+const CluesComponent = ({
+  destination,
+}: {
+  destination: Destination | null;
+}) => {
+  const clues = destination?.clues ? [...destination?.clues] : [];
+  const [randomClue, setRandomClue] = useState<string>("");
+
+  useEffect(() => {
+    setRandomClue(clues[Math.floor(Math.random() * clues.length)]);
+  }, []);
+
+  return (
+    <div className="p-8 space-y-4">
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-[#061720] text-lg font-bold"
+      >
+        {randomClue}
+      </motion.p>
+      <Image src="/man.png" alt="" width={200} height={200} />
     </div>
   );
 };

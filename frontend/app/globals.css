@@ -20,7 +20,7 @@ a {
 /* Loader animation */
 .loader {
   border: 5px solid #f3f3f3;
-  border-top: 5px solid #3498db;
+  border-top: 5px solid #EB9D2A;
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -37,7 +37,9 @@ a {
   transition: all 0.3s ease;
 }
 
-.clues-container {
+
+
+/* .clues-container {
   position: relative;
 }
 
@@ -55,4 +57,17 @@ a {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+} */
+
+ 
+
+
+/* Next button animation */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.bounce-animation {
+  animation: bounce 2s infinite ease-in-out;
 }

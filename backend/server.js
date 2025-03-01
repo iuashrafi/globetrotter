@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/destinations', require('./routes/destinationRoutes'));
-// app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 app.get('/', (req, res) => {
   res.send('Hello world from Imtiaz uddin');
 });

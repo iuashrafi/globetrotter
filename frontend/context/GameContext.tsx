@@ -80,7 +80,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const loadInitialData = async () => {
-      // Use a ref to track if this effect has already run
       if (initialDataLoaded.current) return;
       initialDataLoaded.current = true;
 
@@ -88,14 +87,11 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
       const savedScore = localStorage.getItem("globetrotter_score");
 
       if (savedUsername) {
-        // IMPORTANT: Just set the username state, don't trigger any other functions
         setUsername(savedUsername);
 
-        // Try to fetch user data from server
         try {
           const userData = await getUserData(savedUsername);
 
-          // Directly set the score state
           setScore({
             correct: userData.correctAnswers,
             incorrect: userData.incorrectAnswers,
@@ -103,7 +99,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         } catch (err) {
           console.error("Failed to load user data from server:", err);
 
-          // Fall back to local storage if server fetch fails
           if (savedScore) {
             try {
               setScore(JSON.parse(savedScore));
@@ -121,26 +116,17 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         }
       }
 
-      // Fetch initial destination
       fetchNewDestination();
     };
 
     loadInitialData();
-  }, []); // Empty dependency array - run only once
+  }, []);
 
-  // Update local storage score for non-logged-in users
   useEffect(() => {
     if (!username && (score.correct > 0 || score.incorrect > 0)) {
       localStorage.setItem("globetrotter_score", JSON.stringify(score));
     }
   }, [score, username]);
-
-  // Save username to localStorage
-  // useEffect(() => {
-  //   if (username) {
-  //     localStorage.setItem("globetrotter_username", username);
-  //   }
-  // }, [username]);
 
   const registerOrLogin = async (newUsername: string, localScore = null) => {
     try {
@@ -175,7 +161,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
 
       let newDestination;
 
-      // Call getRandomDestination with appropriate parameters based on authentication status
       if (username) {
         // For logged-in users, pass the username
         newDestination = await getRandomDestination(username);
@@ -208,7 +193,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     } catch (err) {
       const error = err as Error;
 
-      // Handle game over
       if (error.message === "GAME_OVER") {
         setGameOver(true);
         setError("You've completed all available questions!");
@@ -227,7 +211,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     try {
       setLoading(true);
 
-      // Pass username to the API if logged in
       const result = await checkAnswer(
         destination.id,
         selectedAnswer,
@@ -236,14 +219,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
       setResult(result);
       setShowResult(true);
 
-      // Update local score state
       if (result.isCorrect) {
         setScore((prev) => ({ ...prev, correct: prev.correct + 1 }));
       } else {
         setScore((prev) => ({ ...prev, incorrect: prev.incorrect + 1 }));
       }
 
-      // For logged-in users, update score on server
       if (username) {
         await updateScore(username, result.isCorrect);
       }
@@ -264,20 +245,13 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     try {
       setLoading(true);
 
-      if (username) {
-        // Reset progress on server for logged-in users
-        await resetProgress(username);
-      } else {
-        // Reset local storage for non-logged-in users
-        resetLocalProgress();
-      }
+      if (username) await resetProgress(username);
+      else resetLocalProgress();
 
-      // Reset local state
       setScore({ correct: 0, incorrect: 0 });
       setUsedQuestions([]);
       setGameOver(false);
 
-      // Fetch new destination
       await fetchNewDestination();
     } catch (err) {
       setError("Failed to reset progress. Please try again.");
@@ -287,49 +261,16 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // In GameProvider component
-  // const setUsernameWithData = (username: string) => {
-  //   setUsername(username);
-
-  //   // Don't fetch data here - just set the username
-  //   if (username) {
-  //     localStorage.setItem("globetrotter_username", username);
-  //     // Then trigger data loading
-  //     loadUserData(username);
-  //   }
-  // };
-
-  // Separate function to load user data
-  // const loadUserData = async (username: string) => {
-  //   if (!username) return;
-
-  //   try {
-  //     setLoading(true);
-  //     const userData = await getUserData(username);
-  //     setScore({
-  //       correct: userData.correctAnswers,
-  //       incorrect: userData.incorrectAnswers,
-  //     });
-  //   } catch (err) {
-  //     console.error("Failed to load user data:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const logout = () => {
-    // Clear user-related state
     setUsername(null);
     setScore({ correct: 0, incorrect: 0 });
     setUsedQuestions([]);
     setGameOver(false);
 
-    // Remove data from localStorage
     localStorage.removeItem("globetrotter_username");
     localStorage.removeItem("globetrotter_score");
     localStorage.removeItem("globetrotter_used_questions");
 
-    // Fetch a new destination to reset the game state
     fetchNewDestination();
   };
 

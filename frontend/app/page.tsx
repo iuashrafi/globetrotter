@@ -1,36 +1,12 @@
 "use client";
 
-import { Dispatch, SetStateAction, Suspense, useEffect, useState } from "react";
-import { GameProvider, useGameContext } from "../context/GameContext";
+import { Suspense, useEffect, useState } from "react";
+import { GameProvider } from "../context/GameContext";
 import Game from "../components/Game";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
-import CustomButton from "@/components/CustomButton";
-import { Gamepad2, Menu, RotateCcw, Users, X } from "lucide-react";
-import ChallengeButton from "@/components/ChallengeButton";
-import { createUser } from "@/services/api";
-import Link from "next/link";
-import { motion } from "framer-motion";
 
-function HomeContent() {
-  const searchParams = useSearchParams();
-  const [invitedBy, setInvitedBy] = useState<string | null>(null);
-
-  useEffect(() => {
-    const invited = searchParams.get("invited");
-    const by = searchParams.get("by");
-
-    if (invited === "true" && by) {
-      setInvitedBy(by);
-    }
-  }, [searchParams]);
-
-  return (
-    <div className="container mx-auto px-4 flex-1">
-      <Game invitedBy={invitedBy} />
-    </div>
-  );
-}
+import Header from "./_components/Header";
+import Footer from "./_components/Footer";
 
 export default function Home() {
   return (
@@ -46,244 +22,22 @@ export default function Home() {
   );
 }
 
-const DropdownMenu = () => {
-  const { username, logout } = useGameContext();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="p-2 focus:outline-none"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-      {isMenuOpen && (
-        <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-2 z-50">
-          <ul>
-            {username && (
-              <li>
-                <button
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-200"
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  Logout
-                </button>
-              </li>
-            )}
-            <li>
-              <Link
-                target="_blank"
-                href="https://www.linkedin.com/in/iuashrafi/"
-                className="block px-4 py-2 hover:bg-gray-200"
-              >
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const Header = () => {
-  const { score } = useGameContext();
-
-  const totalAnswered = score.correct + score.incorrect;
-  const progressPercentage = (totalAnswered / 19) * 100;
-
-  return (
-    <header className="relative bg-green-00 py-3 px-4 md:px-6">
-      <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-y-4 lg:gap-y-0 gap-x-4 items-center">
-        {/* Menu + Progress Bar (always in one row) */}
-        <div className="flex items-center gap-4 w-full lg:col-span-2">
-          <DropdownMenu />
-          <div className="bg-white flex-1 rounded-full h-5 min-w-[150px] md:min-w-[250px] relative overflow-hidden">
-            <div
-              className="bg-[#EB9D2A] rounded-full h-full"
-              style={{ width: `${progressPercentage}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Counters (move to the same row on lg screens) */}
-        <div className="flex justify-center lg:justify-end gap-4">
-          <span className="flex items-center gap-1">
-            <span className="text-lg md:text-xl">{score.incorrect}</span>
-            <Image
-              src="/wrong.png"
-              width={30}
-              height={30}
-              alt="Wrong"
-              className="w-8 h-8"
-            />
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="text-lg md:text-xl">{score.correct}</span>
-            <Image
-              src="/right.png"
-              width={30}
-              height={30}
-              alt="Right"
-              className="w-8 h-8"
-            />
-          </span>
-        </div>
-      </div>
-    </header>
-  );
-};
-
-const Footer = () => {
-  const { username, setUsername, resetGameProgress } = useGameContext();
-  const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
+const HomeContent = () => {
+  const searchParams = useSearchParams();
+  const [invitedBy, setInvitedBy] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("globetrotter_username");
-    if (storedUsername) {
-      setUsername(storedUsername);
+    const invited = searchParams.get("invited");
+    const by = searchParams.get("by");
+
+    if (invited === "true" && by) {
+      setInvitedBy(by);
     }
-  }, [setUsername]);
+  }, [searchParams]);
 
   return (
-    <footer className="">
-      <div className="w-full bg-white py-6 flex justify-around items-center gap-6 border-t border-t-[#E2E2E2]">
-        {username ? (
-          <ChallengeButton />
-        ) : (
-          <CustomButton
-            title="Challenge a Friend"
-            icon={<Users />}
-            onClick={() => setShowRegisterModal(true)}
-          />
-        )}
-
-        <CustomButton
-          title="Reset"
-          icon={<RotateCcw />}
-          onClick={() => resetGameProgress()}
-          className="bg-[#EBF1F5] border-b-[#D6E0E7] !text-[#061720]"
-        />
-      </div>
-
-      {showRegisterModal && (
-        <UserRegistrationModal setShowRegisterModal={setShowRegisterModal} />
-      )}
-    </footer>
-  );
-};
-
-const UserRegistrationModal = ({
-  setShowRegisterModal,
-}: {
-  setShowRegisterModal: Dispatch<SetStateAction<boolean>>;
-}) => {
-  const {
-    setUsername,
-    score,
-    loading: gameLoading,
-    registerOrLogin,
-  } = useGameContext();
-
-  const [inputUsername, setInputUsername] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    // Check if user is already logged in from localStorage
-    const storedUsername = localStorage.getItem("globetrotter_username");
-    if (storedUsername) {
-      setUsername(storedUsername);
-    }
-  }, [setUsername]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    const userName = inputUsername.trim();
-    if (!userName) return;
-    setIsLoading(true);
-
-    try {
-      // Get current local data to optionally transfer to server
-      const localScore = {
-        correct: score.correct,
-        incorrect: score.incorrect,
-      };
-
-      const localUsedQuestions = JSON.parse(
-        localStorage.getItem("globetrotter_used_questions") || "[]"
-      );
-
-      await createUser(userName, localScore, localUsedQuestions);
-
-      const success = await registerOrLogin(userName);
-
-      if (success) {
-        setShowRegisterModal(false);
-        setInputUsername("");
-      } else {
-        setError("Something went wrong. Please try again.");
-      }
-    } catch (err) {
-      console.error("Registration error:", err);
-      setError("Failed to register. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-[#EEEFE8]/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
-      <button
-        className="cursor-pointer fixed top-8 right-8 rounded-full p-2"
-        onClick={() => {
-          setShowRegisterModal(false);
-        }}
-      >
-        <X />
-      </button>
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: [1.05, 0.98, 1], opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="bg-card bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl shadow-xl p-8 max-w-md w-full relative animate-bounce-in overflow-hidden"
-      >
-        <h2 className="text-xl font-bold mb-4 app-text-color">
-          Login or Register
-        </h2>
-
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={inputUsername}
-            onChange={(e) => setInputUsername(e.target.value)}
-            placeholder="Enter a unique username"
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#EB9D2A]"
-            required
-            disabled={isLoading || gameLoading}
-          />
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-          <motion.button
-            whileTap={{ scale: 0.99, borderBottomWidth: 0 }}
-            type="submit"
-            className={`w-full flex space-x-2 justify-center mt-4 bg-[#EB9D2A] text-white py-2 px-4 rounded-xl border-b-3 border-[#B17716] transition-colors ${
-              isLoading || gameLoading
-                ? " bg-[#EB9D2A]/70 cursor-not-allowed"
-                : ""
-            }`}
-            disabled={isLoading || gameLoading}
-          >
-            <span>{isLoading ? "Processing..." : "Start Playing"}</span>
-            <Gamepad2 />
-          </motion.button>
-        </form>
-      </motion.div>
+    <div className="container mx-auto px-4 flex-1">
+      <Game invitedBy={invitedBy} />
     </div>
   );
 };

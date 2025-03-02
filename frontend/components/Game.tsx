@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useGameContext } from "../context/GameContext";
 import { motion } from "framer-motion";
 import InviteBanner from "./InviteBanner";
-import Image from "next/image";
 import ResultFeedback from "./ResultFeedback";
+import CluesComponent from "./CluesComponent";
 
 interface GameProps {
   invitedBy?: string | null;
@@ -68,12 +68,10 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
   return (
     <div className="game-container max-w-3xl mx-auto p-4">
-      {/* Show Invite Banner if user was invited */}
       {invitedBy && <InviteBanner invitedBy={invitedBy} />}
 
       <CluesComponent />
 
-      {/* new Options section */}
       {!showResult ? (
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-4">
           {destination.options?.map((option, index) => (
@@ -91,31 +89,6 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
       ) : (
         <ResultFeedback />
       )}
-    </div>
-  );
-};
-
-const CluesComponent = () => {
-  const { destination } = useGameContext();
-  const [randomClue, setRandomClue] = useState<string>("");
-
-  useEffect(() => {
-    const clues = destination?.clues ? [...destination.clues] : [];
-    if (clues.length > 0) {
-      setRandomClue(clues[Math.floor(Math.random() * clues.length)]);
-    }
-  }, [destination]);
-
-  return (
-    <div className="p-8 space-y-4">
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-[#061720] text-lg font-bold"
-      >
-        {randomClue}
-      </motion.p>
-      <Image src="/man.png" alt="" width={200} height={200} />
     </div>
   );
 };

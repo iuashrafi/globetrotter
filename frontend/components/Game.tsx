@@ -3,13 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useGameContext } from "../context/GameContext";
 import { motion } from "framer-motion";
-import Confetti from "react-confetti";
-import { useWindowSize } from "react-use";
-import UserRegistration from "./UserRegistration";
-import ChallengeButton from "./ChallengeButton";
 import InviteBanner from "./InviteBanner";
 import Image from "next/image";
-import { AnswerResult, Destination } from "@/services/api";
 import ResultFeedback from "./ResultFeedback";
 
 interface GameProps {
@@ -22,10 +17,8 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
     loading,
     error,
     score,
-    result,
     showResult,
     gameOver,
-    username,
     fetchNewDestination,
     handleAnswer,
   } = useGameContext();
@@ -43,7 +36,7 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
           Game Over!
         </h2>
         <p className="mb-4 text-xl">
-          You've played through all available destinations.
+          You&apos;ve played through all available destinations.
         </p>
         <p className="text-xl font-semibold">
           Your final score: {score.correct} correct out of{" "}
@@ -104,11 +97,13 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
 const CluesComponent = () => {
   const { destination } = useGameContext();
-  const clues = destination?.clues ? [...destination?.clues] : [];
   const [randomClue, setRandomClue] = useState<string>("");
 
   useEffect(() => {
-    setRandomClue(clues[Math.floor(Math.random() * clues.length)]);
+    const clues = destination?.clues ? [...destination.clues] : [];
+    if (clues.length > 0) {
+      setRandomClue(clues[Math.floor(Math.random() * clues.length)]);
+    }
   }, [destination]);
 
   return (

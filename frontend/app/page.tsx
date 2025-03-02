@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, Suspense, useEffect, useState } from "react";
 import { GameProvider, useGameContext } from "../context/GameContext";
 import Game from "../components/Game";
 import { useSearchParams } from "next/navigation";
@@ -8,11 +8,11 @@ import Image from "next/image";
 import CustomButton from "@/components/CustomButton";
 import { Gamepad2, Menu, RotateCcw, Users, X } from "lucide-react";
 import ChallengeButton from "@/components/ChallengeButton";
-import { createUser, getUserData } from "@/services/api";
+import { createUser } from "@/services/api";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const [invitedBy, setInvitedBy] = useState<string | null>(null);
 
@@ -26,12 +26,20 @@ export default function Home() {
   }, [searchParams]);
 
   return (
+    <div className="container mx-auto px-4 flex-1">
+      <Game invitedBy={invitedBy} />
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
     <GameProvider>
       <main className="min-h-screen bg-[#EEEFE8] flex flex-col">
         <Header />
-        <div className="container mx-auto px-4 flex-1">
-          <Game invitedBy={invitedBy} />
-        </div>
+        <Suspense fallback={<div>Loading...</div>}>
+          <HomeContent />
+        </Suspense>
         <Footer />
       </main>
     </GameProvider>
@@ -169,18 +177,19 @@ const Footer = () => {
   );
 };
 
-const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
+const UserRegistrationModal = ({
+  setShowRegisterModal,
+}: {
+  setShowRegisterModal: Dispatch<SetStateAction<boolean>>;
+}) => {
   const {
-    username,
     setUsername,
     score,
-    setScore,
     loading: gameLoading,
     registerOrLogin,
   } = useGameContext();
 
   const [inputUsername, setInputUsername] = useState("");
-  // const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -189,7 +198,6 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     const storedUsername = localStorage.getItem("globetrotter_username");
     if (storedUsername) {
       setUsername(storedUsername);
-      // setIsRegistered(true);
     }
   }, [setUsername]);
 
@@ -211,10 +219,8 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
         localStorage.getItem("globetrotter_used_questions") || "[]"
       );
 
-      // Call the createUser API function with local data
       await createUser(userName, localScore, localUsedQuestions);
 
-      // Use the new function which handles both state updates
       const success = await registerOrLogin(userName);
 
       if (success) {
@@ -231,53 +237,6 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     }
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setError("");
-  //   const userName = inputUsername.trim();
-  //   if (!userName) return;
-  //   setIsLoading(true);
-  //   try {
-  //     // Get current local data to optionally transfer to server
-  //     const localScore = {
-  //       correct: score.correct,
-  //       incorrect: score.incorrect,
-  //     };
-
-  //     const localUsedQuestions = JSON.parse(
-  //       localStorage.getItem("globetrotter_used_questions") || "[]"
-  //     );
-
-  //     // Call the createUser API function with local data
-  //     await createUser(userName, localScore, localUsedQuestions);
-
-  //     // Set the username first
-  //     setUsername(userName);
-
-  //     // Then directly fetch and update the score
-  //     const userData = await getUserData(userName);
-  //     setScore({
-  //       correct: userData.correctAnswers,
-  //       incorrect: userData.incorrectAnswers,
-  //     });
-
-  //     setShowRegisterModal(false);
-  //     setInputUsername("");
-  //   } catch (err) {
-  //     console.error("Registration error:", err);
-  //     setError("Failed to register. Please try again.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  const handleChangeUsername = () => {
-    // Clear username but keep other data
-    localStorage.removeItem("globetrotter_username");
-    setUsername("");
-    setInputUsername("");
-    // setIsRegistered(false);
-  };
   return (
     <div className="fixed inset-0 bg-[#EEEFE8]/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
       <button

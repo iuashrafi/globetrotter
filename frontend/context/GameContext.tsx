@@ -17,7 +17,6 @@ import {
   getUserData,
   resetProgress,
   resetLocalProgress,
-  UserScore,
   Destination,
   AnswerResult,
 } from "../services/api";
@@ -66,8 +65,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     return [];
   });
   const [gameOver, setGameOver] = useState<boolean>(false);
-  const initialFetchCompleted = useRef(false);
-  const isLoadingUserData = useRef(false);
   const initialDataLoaded = useRef(false); // Add this new ref
 
   // Update localStorage whenever usedQuestions changes (for non-logged-in users)
@@ -291,34 +288,34 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // In GameProvider component
-  const setUsernameWithData = (username: string) => {
-    setUsername(username);
+  // const setUsernameWithData = (username: string) => {
+  //   setUsername(username);
 
-    // Don't fetch data here - just set the username
-    if (username) {
-      localStorage.setItem("globetrotter_username", username);
-      // Then trigger data loading
-      loadUserData(username);
-    }
-  };
+  //   // Don't fetch data here - just set the username
+  //   if (username) {
+  //     localStorage.setItem("globetrotter_username", username);
+  //     // Then trigger data loading
+  //     loadUserData(username);
+  //   }
+  // };
 
   // Separate function to load user data
-  const loadUserData = async (username: string) => {
-    if (!username) return;
+  // const loadUserData = async (username: string) => {
+  //   if (!username) return;
 
-    try {
-      setLoading(true);
-      const userData = await getUserData(username);
-      setScore({
-        correct: userData.correctAnswers,
-        incorrect: userData.incorrectAnswers,
-      });
-    } catch (err) {
-      console.error("Failed to load user data:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     setLoading(true);
+  //     const userData = await getUserData(username);
+  //     setScore({
+  //       correct: userData.correctAnswers,
+  //       incorrect: userData.incorrectAnswers,
+  //     });
+  //   } catch (err) {
+  //     console.error("Failed to load user data:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const logout = () => {
     // Clear user-related state

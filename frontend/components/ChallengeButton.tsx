@@ -3,15 +3,17 @@
 import React, { useState, useRef } from "react";
 import { useGameContext } from "../context/GameContext";
 import { motion, AnimatePresence } from "framer-motion";
-import html2canvas from "html2canvas";
+// import html2canvas from "html2canvas";
 import CustomButton from "./CustomButton";
 import { Copy, Users, X } from "lucide-react";
 
 const ChallengeButton: React.FC = () => {
   const { username, score } = useGameContext();
   const [showModal, setShowModal] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_imageUrl, _setImageUrl] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_isGeneratingImage, _setIsGeneratingImage] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Create invite link with username parameter
@@ -21,6 +23,7 @@ const ChallengeButton: React.FC = () => {
   };
 
   // Generate image from the share card for WhatsApp sharing
+  /*
   const generateShareImage = async () => {
     if (!shareCardRef.current) return;
 
@@ -38,6 +41,7 @@ const ChallengeButton: React.FC = () => {
       setIsGeneratingImage(false);
     }
   };
+  */
 
   const handleShareWhatsApp = () => {
     const inviteLink = getInviteLink();
@@ -69,7 +73,7 @@ const ChallengeButton: React.FC = () => {
           onClick={() => {
             setShowModal(true);
             // Generate image immediately when opening modal
-            setTimeout(() => generateShareImage(), 100);
+            // setTimeout(() => generateShareImage(), 100);
           }}
         />
       )}
@@ -104,10 +108,16 @@ const ChallengeButton: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Share Card that will be converted to image */}
                 <div
                   ref={shareCardRef}
-                  className="bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-600 py-8 px-6 rounded-lg text-white mb-4"
+                  style={{
+                    background:
+                      "linear-gradient(to right, #8B5CF6, #4F46E5, #8B5CF6)", // Replace with hex colors
+                    padding: "2rem 1.5rem", // py-8 px-6
+                    borderRadius: "0.5rem", // rounded-lg
+                    color: "white", // text-white
+                    marginBottom: "1rem", // mb-4
+                  }}
                 >
                   <div className="text-center mb-4">
                     <h4 className="text-2xl font-bold">Globetrotter</h4>
@@ -115,20 +125,30 @@ const ChallengeButton: React.FC = () => {
                       The Ultimate Travel Guessing Game
                     </p>
                   </div>
-                  <div className="bg-[#EEEFE8]/30 p-4 rounded-md backdrop-blur-xl">
-                    <p className="font-medium">
-                      I, <span className="font-bold">{username}</span>,
+
+                  <div
+                    style={{
+                      backgroundColor: "rgba(238, 239, 232, 0.3)", // bg-[#EEEFE8]/30
+                      padding: "1rem", // p-4
+                      borderRadius: "0.375rem", // rounded-md
+                      backdropFilter: "blur(12px)", // backdrop-blur-xl
+                    }}
+                  >
+                    <p style={{ fontWeight: "500" }}>
+                      I, <span style={{ fontWeight: "bold" }}>{username}</span>,
                       challenge you!
                     </p>
-                    <p className="mt-2">
+                    <p style={{ marginTop: "0.5rem" }}>
                       Can you beat my score of{" "}
-                      <span className="font-bold text-xl">{score.correct}</span>{" "}
+                      <span style={{ fontWeight: "bold", fontSize: "1.25rem" }}>
+                        {score.correct}
+                      </span>
                       correct answers?
                     </p>
                   </div>
                 </div>
 
-                {/* Show generated image */}
+                {/* Show generated image - NOT REQUIRED - CODE for reference */}
                 {/* {isGeneratingImage ? (
                   <div className="text-center py-4">
                     <div className="loader mx-auto"></div>

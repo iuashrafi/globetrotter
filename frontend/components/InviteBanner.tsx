@@ -57,7 +57,7 @@ const InviteBanner: React.FC<InviteBannerProps> = ({ invitedBy }) => {
         Challenge from {inviterScore?.username}
       </h3>
       <p className="text-gray-700">
-        You've been challenged to beat a score of{" "}
+        You&apos;ve been challenged to beat a score of{" "}
         <span className="font-bold text-green-600">
           {inviterScore?.correctAnswers || 0}
         </span>{" "}

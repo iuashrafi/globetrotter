@@ -14,9 +14,6 @@ exports.getRandomDestination = async (req, res) => {
       }
     }
 
-    // Convert usedQuestionIds to ObjectIds if needed
-    // const usedObjectIds = usedQuestionIds.map(id => mongoose.Types.ObjectId(id));
-
     // Get total count of destinations excluding used ones
     const query = usedQuestionIds.length > 0 ? 
       { _id: { $nin: usedQuestionIds } } : 
@@ -109,7 +106,6 @@ exports.checkAnswer = async (req, res) => {
     const factsArray = isCorrect ? destination.fun_fact : destination.trivia;
     const randomFact = factsArray[Math.floor(Math.random() * factsArray.length)];
     
-    // If username is provided, update their used questions in the database
     if (username) {
       try {
         const user = await User.findOne({ username });
@@ -119,7 +115,6 @@ exports.checkAnswer = async (req, res) => {
         }
       } catch (err) {
         console.error('Error updating user used questions:', err);
-        // Continue with the response anyway
       }
     }
     
@@ -135,7 +130,6 @@ exports.checkAnswer = async (req, res) => {
   }
 };
 
-// The generateOptions function remains the same
 async function generateOptions(correctCity) {
   try {
     // Get 3 random cities excluding the correct one

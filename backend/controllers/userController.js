@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-// Create or update user
+
 exports.createUser = async (req, res) => {
   try {
     const { username, localScore, usedQuestions } = req.body;
@@ -12,13 +12,11 @@ exports.createUser = async (req, res) => {
     let user = await User.findOne({ username });
     
     if (user) {
-      // Update last login time
       user.lastLogin = Date.now(); // not required => remove later
       await user.save();
       return res.status(200).json(user);
     }
 
-    // Create new user, potentially with local data
     user = new User({
       username,
       correctAnswers: localScore?.correct || 0,
@@ -35,7 +33,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Update user score
+
 exports.updateScore = async (req, res) => {
   try {
     const { username, isCorrect } = req.body;
@@ -44,14 +42,12 @@ exports.updateScore = async (req, res) => {
       return res.status(400).json({ message: "Please provide a username" });
     }
 
-    // Find user
     const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update score
     if (isCorrect) {
       user.correctAnswers += 1;
     } else {
@@ -66,7 +62,6 @@ exports.updateScore = async (req, res) => {
   }
 };
 
-// Add question to used questions
 exports.addUsedQuestion = async (req, res) => {
   try {
     const { username, questionId } = req.body;
@@ -81,7 +76,6 @@ exports.addUsedQuestion = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Add to used questions if not already there
     if (!user.usedQuestions.includes(questionId)) {
       user.usedQuestions.push(questionId);
       await user.save();
@@ -93,7 +87,6 @@ exports.addUsedQuestion = async (req, res) => {
   }
 };
 
-// Get user data including score and used questions
 exports.getUserData = async (req, res) => {
   try {
     const { username } = req.params;
@@ -102,7 +95,6 @@ exports.getUserData = async (req, res) => {
       return res.status(400).json({ message: "Please provide a username" });
     }
 
-    // Find user
     const user = await User.findOne({ username });
 
     if (!user) {
@@ -121,7 +113,7 @@ exports.getUserData = async (req, res) => {
   }
 };
 
-// Reset user progress
+
 exports.resetProgress = async (req, res) => {
   try {
     const { username } = req.body;
@@ -157,7 +149,6 @@ exports.getUserScore = async (req, res) => {
       return res.status(400).json({ message: "Please provide a username" });
     }
 
-    // Find user
     const user = await User.findOne({ username });
 
     if (!user) {

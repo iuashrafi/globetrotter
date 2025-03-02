@@ -34,6 +34,7 @@ interface GameContextProps {
   handleAnswer: (answer: string) => Promise<void>;
   resetResult: () => void;
   resetGameProgress: () => Promise<void>;
+  logout: () => void;
 }
 
 const GameContext = createContext<GameContextProps | undefined>(undefined);
@@ -163,16 +164,25 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         newDestination = await getRandomDestination(null, usedQuestions);
       }
 
+      if ("gameOver" in newDestination && newDestination.gameOver) {
+        setGameOver(true);
+        setError("You've completed all available questions!");
+        return;
+      }
+
+      const destinationData = newDestination as Destination;
+      setDestination(destinationData);
+
       if (newDestination) {
-        setDestination(newDestination);
+        setDestination(newDestination as Destination);
 
         // Only track used questions locally for non-logged-in users
-        if (!username && !usedQuestions.includes(newDestination.id)) {
+        if (!username && !usedQuestions.includes(destinationData.id)) {
           console.log(
             "Adding new question ID to used questions:",
-            newDestination.id
+            destinationData.id
           );
-          setUsedQuestions((prevUsed) => [...prevUsed, newDestination.id]);
+          setUsedQuestions((prevUsed) => [...prevUsed, destinationData.id]);
         }
       }
     } catch (err) {
@@ -257,6 +267,22 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const logout = () => {
+    // Clear user-related state
+    setUsername(null);
+    setScore({ correct: 0, incorrect: 0 });
+    setUsedQuestions([]);
+    setGameOver(false);
+
+    // Remove data from localStorage
+    localStorage.removeItem("globetrotter_username");
+    localStorage.removeItem("globetrotter_score");
+    localStorage.removeItem("globetrotter_used_questions");
+
+    // Fetch a new destination to reset the game state
+    fetchNewDestination();
+  };
+
   return (
     <GameContext.Provider
       value={{
@@ -273,6 +299,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         handleAnswer,
         resetResult,
         resetGameProgress,
+        logout,
       }}
     >
       {children}

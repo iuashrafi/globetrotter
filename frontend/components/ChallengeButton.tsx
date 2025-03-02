@@ -90,7 +90,7 @@ const ChallengeButton: React.FC = () => {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl  max-w-md w-full overflow-hidden"
+              className="bg-[#EEEFE8] shadow-xl border border-[#D6E0E7] rounded-2xl  max-w-md w-full overflow-hidden"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}

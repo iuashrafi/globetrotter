@@ -9,6 +9,7 @@ import CustomButton from "@/components/CustomButton";
 import { Menu, RotateCcw, Users, X } from "lucide-react";
 import ChallengeButton from "@/components/ChallengeButton";
 import { createUser } from "@/services/api";
+import Link from "next/link";
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -25,7 +26,7 @@ export default function Home() {
 
   return (
     <GameProvider>
-      <main className="min-h-screen bg-[#EEEFE8] py-8 flex flex-col">
+      <main className="min-h-screen bg-[#EEEFE8] flex flex-col">
         <Header />
         <div className="container mx-auto px-4 flex-1">
           <Game invitedBy={invitedBy} />
@@ -36,51 +37,84 @@ export default function Home() {
   );
 }
 
-const Header = () => {
-  const { score } = useGameContext();
+const DropdownMenu = () => {
+  const { username, logout } = useGameContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="relative">
-      <div className="w-4xl container mx-auto flex gap-6 items-center">
-        <div className="relative">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
-            <Menu />
-          </button>
-          {isMenuOpen && (
-            <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-2">
-              <ul>
-                <li>
-                  <button
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-200"
-                    onClick={() => alert("logging out")}
-                  >
-                    Logout
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="/about"
-                    className="block px-4 py-2 hover:bg-gray-200"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-          )}
+    <div className="relative">
+      <button
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="p-2 focus:outline-none"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+      {isMenuOpen && (
+        <div className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg p-2 z-50">
+          <ul>
+            {username && (
+              <li>
+                <button
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-200"
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Logout
+                </button>
+              </li>
+            )}
+            <li>
+              <Link
+                target="_blank"
+                href="https://www.linkedin.com/in/iuashrafi/"
+                className="block px-4 py-2 hover:bg-gray-200"
+              >
+                Contact
+              </Link>
+            </li>
+          </ul>
         </div>
-        <div className="bg-white flex-1 rounded-full">
-          <div className="bg-[#EB9D2A] rounded-full h-full w-[40%]">&nbsp;</div>
+      )}
+    </div>
+  );
+};
+
+const Header = () => {
+  const { score } = useGameContext();
+  return (
+    <header className="relative bg-green-00 py-3 px-4 md:px-6">
+      <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-y-4 lg:gap-y-0 gap-x-4 items-center">
+        {/* Menu + Progress Bar (always in one row) */}
+        <div className="flex items-center gap-4 w-full lg:col-span-2">
+          <DropdownMenu />
+          <div className="bg-white flex-1 rounded-full h-5 min-w-[150px] md:min-w-[250px] relative overflow-hidden">
+            <div className="bg-[#EB9D2A] rounded-full h-full w-[40%]"></div>
+          </div>
         </div>
-        <div className="flex gap-2.5">
-          <span className="flex justify-center items-center gap-1">
-            <span className="text-xl">{score.correct}</span>
-            <Image src="/wrong.png" width={30} height={30} alt="Wrong" />
+
+        {/* Counters (move to the same row on lg screens) */}
+        <div className="flex justify-center lg:justify-end gap-4">
+          <span className="flex items-center gap-1">
+            <span className="text-lg md:text-xl">{score.incorrect}</span>
+            <Image
+              src="/wrong.png"
+              width={30}
+              height={30}
+              alt="Wrong"
+              className="w-8 h-8"
+            />
           </span>
-          <span className="flex justify-center items-center gap-1">
-            <span className="text-xl">{score.incorrect}</span>
-            <Image src="/right.png" width={30} height={30} alt="Right" />
+          <span className="flex items-center gap-1">
+            <span className="text-lg md:text-xl">{score.correct}</span>
+            <Image
+              src="/right.png"
+              width={30}
+              height={30}
+              alt="Right"
+              className="w-8 h-8"
+            />
           </span>
         </div>
       </div>
@@ -89,8 +123,16 @@ const Header = () => {
 };
 
 const Footer = () => {
-  const { username } = useGameContext();
+  const { username, setUsername, resetGameProgress } = useGameContext();
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("globetrotter_username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, [setUsername]);
+
   return (
     <footer className="">
       <div className="w-full bg-white py-6 flex justify-around items-center gap-6 border-t border-t-[#E2E2E2]">
@@ -107,6 +149,7 @@ const Footer = () => {
         <CustomButton
           title="Reset"
           icon={<RotateCcw />}
+          onClick={() => resetGameProgress()}
           className="bg-[#EBF1F5] border-b-[#D6E0E7] !text-[#061720]"
         />
       </div>
@@ -126,7 +169,7 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     loading: gameLoading,
   } = useGameContext();
   const [inputUsername, setInputUsername] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
+  // const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -135,7 +178,7 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     const storedUsername = localStorage.getItem("globetrotter_username");
     if (storedUsername) {
       setUsername(storedUsername);
-      setIsRegistered(true);
+      // setIsRegistered(true);
     }
   }, [setUsername]);
 
@@ -159,8 +202,9 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
       await createUser(userName, localScore, localUsedQuestions);
       // Update state
       setUsername(userName);
-      setIsRegistered(true);
+      // setIsRegistered(true);
       setShowRegisterModal(false);
+      setInputUsername("");
 
       // We don't need to set a success message as the username display will confirm success
     } catch (err) {
@@ -176,7 +220,7 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     localStorage.removeItem("globetrotter_username");
     setUsername("");
     setInputUsername("");
-    setIsRegistered(false);
+    // setIsRegistered(false);
   };
   return (
     <div className="fixed inset-0 bg-[#EEEFE8]/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
@@ -207,7 +251,9 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
           <button
             type="submit"
             className={`w-full mt-4 bg-[#EB9D2A] text-white py-2 px-4 rounded-xl border-b-3 border-[#B17716] transition-colors ${
-              isLoading || gameLoading ? "opacity-70 cursor-not-allowed" : ""
+              isLoading || gameLoading
+                ? " bg-[#EB9D2A]/70 cursor-not-allowed"
+                : ""
             }`}
             disabled={isLoading || gameLoading}
           >

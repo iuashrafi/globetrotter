@@ -148,3 +148,31 @@ exports.resetProgress = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+exports.getUserScore = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    if (!username) {
+      return res.status(400).json({ message: "Please provide a username" });
+    }
+
+    // Find user
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      username: user.username,
+      correctAnswers: user.correctAnswers,
+      incorrectAnswers: user.incorrectAnswers,
+      totalAnswers: user.correctAnswers + user.incorrectAnswers,
+
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+

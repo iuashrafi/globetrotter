@@ -33,7 +33,13 @@ export interface UserScore {
 export const getRandomDestination = async (
   username?: string | null,
   usedQuestions?: string[]
-): Promise<Destination> => {
+): Promise<
+  | Destination
+  | {
+      message: string;
+      gameOver: boolean;
+    }
+> => {
   try {
     if (username) {
       const query = username ? `?username=${encodeURIComponent(username)}` : "";
@@ -251,6 +257,11 @@ export const resetProgress = async (username: string): Promise<any> => {
 export const resetLocalProgress = (): void => {
   localStorage.removeItem("globetrotter_score");
   localStorage.removeItem("globetrotter_used_questions");
+};
+
+export const getUserScore = async (username: string): Promise<UserScore> => {
+  const response = await api.get(`/users/${username}/score`);
+  return response.data;
 };
 
 export default api;

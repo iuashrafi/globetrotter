@@ -68,30 +68,21 @@ const ResultFeedback: React.FC = () => {
                   {result?.correctAnswer}, {result?.country}
                 </span>
               </div>
-
-              {/* {result && (
-                <div className="flex flex-col items-center mt-2">
-                  <p className="text-sm text-muted-foreground">You selected:</p>
-                  <span className="font-medium">
-                    {result.correctAnswer}, {result.country}
-                  </span>
-                </div>
-              )} */}
             </div>
           )}
         </div>
 
-        <div className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-5 rounded-xl mb-4 relative z-10 border border-primary/10 shadow-inner">
+        <div className="bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-600 text-white p-5 rounded-xl mb-4 relative z-10 app-border-color">
           <div className="flex items-start">
-            <div className="bg-primary/20 rounded-full p-1.5 mr-3 mt-0.5">
-              <Info className="h-4 w-4 text-primary" />
+            <div className="p-0.5 mr-3 mt-0.5">
+              <Info className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h4 className="font-medium mb-1 text-sm uppercase tracking-wide text-primary flex items-center">
-                Fun Fact
-                <Heart className="h-3 w-3 text-pink-500 ml-1" fill="#ec4899" />
+              <h4 className="mb-1 text-sm uppercase tracking-wide text-primary flex items-center font-semibold">
+                Fun Fact&nbsp;
+                <Heart className="h-5 w-5 text-pink-500 ml-1" fill="#ec4899" />
               </h4>
-              <p className="text-foreground">{result?.fact}</p>
+              <p className="text-white">{result?.fact}</p>
             </div>
           </div>
         </div>

@@ -49,7 +49,6 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
           Your final score: {score.correct} correct out of{" "}
           {score.correct + score.incorrect} total answers.
         </p>
-        <ChallengeButton />
       </div>
     );
   }
@@ -76,9 +75,6 @@ const Game: React.FC<GameProps> = ({ invitedBy = null }) => {
 
   return (
     <div className="game-container max-w-3xl mx-auto p-4">
-      {/* User Registration */}
-      {/* <UserRegistration /> */}
-
       {/* Show Invite Banner if user was invited */}
       {invitedBy && <InviteBanner invitedBy={invitedBy} />}
 

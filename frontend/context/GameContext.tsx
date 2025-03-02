@@ -7,6 +7,8 @@ import React, {
   useEffect,
   ReactNode,
   useRef,
+  SetStateAction,
+  Dispatch,
 } from "react";
 import {
   getRandomDestination,
@@ -25,6 +27,8 @@ interface GameContextProps {
   loading: boolean;
   error: string | null;
   score: { correct: number; incorrect: number };
+  setScore: Dispatch<SetStateAction<{ correct: number; incorrect: number }>>;
+  registerOrLogin: (username: string, localScore?: any) => Promise<boolean>;
   username: string | null;
   result: AnswerResult | null;
   showResult: boolean;
@@ -64,6 +68,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
   const [gameOver, setGameOver] = useState<boolean>(false);
   const initialFetchCompleted = useRef(false);
   const isLoadingUserData = useRef(false);
+  const initialDataLoaded = useRef(false); // Add this new ref
 
   // Update localStorage whenever usedQuestions changes (for non-logged-in users)
   useEffect(() => {
@@ -76,29 +81,28 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [usedQuestions, username]);
 
-  // Initial setup - load saved data or fetch from server
   useEffect(() => {
     const loadInitialData = async () => {
+      // Use a ref to track if this effect has already run
+      if (initialDataLoaded.current) return;
+      initialDataLoaded.current = true;
+
       const savedUsername = localStorage.getItem("globetrotter_username");
       const savedScore = localStorage.getItem("globetrotter_score");
 
       if (savedUsername) {
+        // IMPORTANT: Just set the username state, don't trigger any other functions
         setUsername(savedUsername);
 
         // Try to fetch user data from server
         try {
-          isLoadingUserData.current = true;
           const userData = await getUserData(savedUsername);
 
-          // Set score from server data
+          // Directly set the score state
           setScore({
             correct: userData.correctAnswers,
             incorrect: userData.incorrectAnswers,
           });
-
-          // We don't need to update usedQuestions state as it will be
-          // handled directly by the server when fetching new questions
-          console.log("Loaded user data from server:", userData);
         } catch (err) {
           console.error("Failed to load user data from server:", err);
 
@@ -110,8 +114,6 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
               console.error("Error parsing saved score", e);
             }
           }
-        } finally {
-          isLoadingUserData.current = false;
         }
       } else if (savedScore) {
         // For non-logged in users, use localStorage score
@@ -122,15 +124,12 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         }
       }
 
-      // Only fetch initial destination if we haven't done so already
-      if (!initialFetchCompleted.current) {
-        initialFetchCompleted.current = true;
-        fetchNewDestination();
-      }
+      // Fetch initial destination
+      fetchNewDestination();
     };
 
     loadInitialData();
-  }, []);
+  }, []); // Empty dependency array - run only once
 
   // Update local storage score for non-logged-in users
   useEffect(() => {
@@ -140,11 +139,35 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
   }, [score, username]);
 
   // Save username to localStorage
-  useEffect(() => {
-    if (username) {
-      localStorage.setItem("globetrotter_username", username);
+  // useEffect(() => {
+  //   if (username) {
+  //     localStorage.setItem("globetrotter_username", username);
+  //   }
+  // }, [username]);
+
+  const registerOrLogin = async (newUsername: string, localScore = null) => {
+    try {
+      // Save username to localStorage
+      localStorage.setItem("globetrotter_username", newUsername);
+
+      // Update state directly
+      setUsername(newUsername);
+
+      // Fetch user data if it exists
+      const userData = await getUserData(newUsername);
+
+      // Update score with server data
+      setScore({
+        correct: userData.correctAnswers,
+        incorrect: userData.incorrectAnswers,
+      });
+
+      return true;
+    } catch (err) {
+      console.error("Failed to register/login user:", err);
+      return false;
     }
-  }, [username]);
+  };
 
   const fetchNewDestination = async () => {
     try {
@@ -267,6 +290,36 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // In GameProvider component
+  const setUsernameWithData = (username: string) => {
+    setUsername(username);
+
+    // Don't fetch data here - just set the username
+    if (username) {
+      localStorage.setItem("globetrotter_username", username);
+      // Then trigger data loading
+      loadUserData(username);
+    }
+  };
+
+  // Separate function to load user data
+  const loadUserData = async (username: string) => {
+    if (!username) return;
+
+    try {
+      setLoading(true);
+      const userData = await getUserData(username);
+      setScore({
+        correct: userData.correctAnswers,
+        incorrect: userData.incorrectAnswers,
+      });
+    } catch (err) {
+      console.error("Failed to load user data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     // Clear user-related state
     setUsername(null);
@@ -290,11 +343,13 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({
         loading,
         error,
         score,
+        setScore,
         username,
         result,
         showResult,
         gameOver,
         setUsername,
+        registerOrLogin,
         fetchNewDestination,
         handleAnswer,
         resetResult,

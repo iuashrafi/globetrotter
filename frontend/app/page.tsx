@@ -8,7 +8,7 @@ import Image from "next/image";
 import CustomButton from "@/components/CustomButton";
 import { Menu, RotateCcw, Users, X } from "lucide-react";
 import ChallengeButton from "@/components/ChallengeButton";
-import { createUser } from "@/services/api";
+import { createUser, getUserData } from "@/services/api";
 import Link from "next/link";
 
 export default function Home() {
@@ -166,8 +166,11 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     username,
     setUsername,
     score,
+    setScore,
     loading: gameLoading,
+    registerOrLogin,
   } = useGameContext();
+
   const [inputUsername, setInputUsername] = useState("");
   // const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -188,6 +191,7 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
     const userName = inputUsername.trim();
     if (!userName) return;
     setIsLoading(true);
+
     try {
       // Get current local data to optionally transfer to server
       const localScore = {
@@ -198,15 +202,19 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
       const localUsedQuestions = JSON.parse(
         localStorage.getItem("globetrotter_used_questions") || "[]"
       );
+
       // Call the createUser API function with local data
       await createUser(userName, localScore, localUsedQuestions);
-      // Update state
-      setUsername(userName);
-      // setIsRegistered(true);
-      setShowRegisterModal(false);
-      setInputUsername("");
 
-      // We don't need to set a success message as the username display will confirm success
+      // Use the new function which handles both state updates
+      const success = await registerOrLogin(userName);
+
+      if (success) {
+        setShowRegisterModal(false);
+        setInputUsername("");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } catch (err) {
       console.error("Registration error:", err);
       setError("Failed to register. Please try again.");
@@ -214,6 +222,46 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
       setIsLoading(false);
     }
   };
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   const userName = inputUsername.trim();
+  //   if (!userName) return;
+  //   setIsLoading(true);
+  //   try {
+  //     // Get current local data to optionally transfer to server
+  //     const localScore = {
+  //       correct: score.correct,
+  //       incorrect: score.incorrect,
+  //     };
+
+  //     const localUsedQuestions = JSON.parse(
+  //       localStorage.getItem("globetrotter_used_questions") || "[]"
+  //     );
+
+  //     // Call the createUser API function with local data
+  //     await createUser(userName, localScore, localUsedQuestions);
+
+  //     // Set the username first
+  //     setUsername(userName);
+
+  //     // Then directly fetch and update the score
+  //     const userData = await getUserData(userName);
+  //     setScore({
+  //       correct: userData.correctAnswers,
+  //       incorrect: userData.incorrectAnswers,
+  //     });
+
+  //     setShowRegisterModal(false);
+  //     setInputUsername("");
+  //   } catch (err) {
+  //     console.error("Registration error:", err);
+  //     setError("Failed to register. Please try again.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleChangeUsername = () => {
     // Clear username but keep other data

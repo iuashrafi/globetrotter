@@ -6,10 +6,11 @@ import Game from "../components/Game";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import CustomButton from "@/components/CustomButton";
-import { Menu, RotateCcw, Users, X } from "lucide-react";
+import { Gamepad2, Menu, RotateCcw, Users, X } from "lucide-react";
 import ChallengeButton from "@/components/ChallengeButton";
 import { createUser, getUserData } from "@/services/api";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const searchParams = useSearchParams();
@@ -83,6 +84,10 @@ const DropdownMenu = () => {
 
 const Header = () => {
   const { score } = useGameContext();
+
+  const totalAnswered = score.correct + score.incorrect;
+  const progressPercentage = (totalAnswered / 19) * 100;
+
   return (
     <header className="relative bg-green-00 py-3 px-4 md:px-6">
       <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-y-4 lg:gap-y-0 gap-x-4 items-center">
@@ -90,7 +95,10 @@ const Header = () => {
         <div className="flex items-center gap-4 w-full lg:col-span-2">
           <DropdownMenu />
           <div className="bg-white flex-1 rounded-full h-5 min-w-[150px] md:min-w-[250px] relative overflow-hidden">
-            <div className="bg-[#EB9D2A] rounded-full h-full w-[40%]"></div>
+            <div
+              className="bg-[#EB9D2A] rounded-full h-full"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
           </div>
         </div>
 
@@ -280,7 +288,13 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
       >
         <X />
       </button>
-      <div className="bg-card bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl shadow-xl p-8 max-w-md w-full relative animate-bounce-in overflow-hidden">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: [1.05, 0.98, 1], opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-card bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl shadow-xl p-8 max-w-md w-full relative animate-bounce-in overflow-hidden"
+      >
         <h2 className="text-xl font-bold mb-4 app-text-color">
           Login or Register
         </h2>
@@ -296,19 +310,21 @@ const UserRegistrationModal = ({ setShowRegisterModal }: any) => {
             disabled={isLoading || gameLoading}
           />
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.99, borderBottomWidth: 0 }}
             type="submit"
-            className={`w-full mt-4 bg-[#EB9D2A] text-white py-2 px-4 rounded-xl border-b-3 border-[#B17716] transition-colors ${
+            className={`w-full flex space-x-2 justify-center mt-4 bg-[#EB9D2A] text-white py-2 px-4 rounded-xl border-b-3 border-[#B17716] transition-colors ${
               isLoading || gameLoading
                 ? " bg-[#EB9D2A]/70 cursor-not-allowed"
                 : ""
             }`}
             disabled={isLoading || gameLoading}
           >
-            {isLoading ? "Processing..." : "Start Playing"}
-          </button>
+            <span>{isLoading ? "Processing..." : "Start Playing"}</span>
+            <Gamepad2 />
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

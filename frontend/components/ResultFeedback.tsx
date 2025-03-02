@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { Check, X, Info, MapPin, Heart } from "lucide-react";
 import { useWindowSize } from "react-use";
 import Confetti from "react-confetti";
@@ -8,18 +9,25 @@ import { useGameContext } from "@/context/GameContext";
 const ResultFeedback: React.FC = () => {
   const { width, height } = useWindowSize();
   const { result, fetchNewDestination } = useGameContext();
-  return (
-    <div className="fixed inset-0 bg-[#EEEFE8]/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-card bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl shadow-xl p-8 max-w-md w-full relative animate-bounce-in overflow-hidden">
-        {result?.isCorrect && (
-          <Confetti
-            width={width}
-            height={height}
-            recycle={false}
-            numberOfPieces={300}
-          />
-        )}
 
+  return (
+    <div className="fixed inset-0 bg-[#EEEFE8]/60 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+      {result?.isCorrect && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={300}
+        />
+      )}
+
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: [1.05, 0.98, 1], opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="bg-[#EEEFE8] border border-[#D6E0E7] rounded-2xl shadow-xl p-8 max-w-md w-full relative overflow-hidden"
+      >
         <div className="flex justify-center mb-6 relative z-10">
           <div
             className={`rounded-full p-4 ${
@@ -86,7 +94,7 @@ const ResultFeedback: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       <CustomButton
         title={"Next"}

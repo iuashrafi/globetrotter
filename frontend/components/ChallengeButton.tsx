@@ -63,21 +63,15 @@ const ChallengeButton: React.FC = () => {
   return (
     <>
       {username && (
-        <motion.div
-          className=""
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          <CustomButton
-            title="Challenge a Friend"
-            icon={<Users />}
-            onClick={() => {
-              setShowModal(true);
-              // Generate image immediately when opening modal
-              setTimeout(() => generateShareImage(), 100);
-            }}
-          />
-        </motion.div>
+        <CustomButton
+          title="Challenge a Friend"
+          icon={<Users />}
+          onClick={() => {
+            setShowModal(true);
+            // Generate image immediately when opening modal
+            setTimeout(() => generateShareImage(), 100);
+          }}
+        />
       )}
 
       {/* Share Modal */}
@@ -88,12 +82,14 @@ const ChallengeButton: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           >
             <motion.div
-              className="bg-[#EEEFE8] shadow-xl border border-[#D6E0E7] rounded-2xl  max-w-md w-full overflow-hidden"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
+              className="bg-[#EEEFE8] shadow-xl border border-[#D6E0E7] rounded-2xl max-w-md w-full overflow-hidden"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: [1.05, 0.98, 1], opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               <div className="p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -133,7 +129,7 @@ const ChallengeButton: React.FC = () => {
                 </div>
 
                 {/* Show generated image */}
-                {isGeneratingImage ? (
+                {/* {isGeneratingImage ? (
                   <div className="text-center py-4">
                     <div className="loader mx-auto"></div>
                     <p className="text-sm text-gray-500 mt-2">
@@ -151,7 +147,9 @@ const ChallengeButton: React.FC = () => {
                       className="max-w-full h-auto rounded border border-gray-200"
                     />
                   </div>
-                ) : null}
+                ) : (
+                  <></>
+                )} */}
 
                 {/* Share buttons */}
                 <div className="flex flex-col gap-3">
